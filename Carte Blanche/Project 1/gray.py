@@ -13,6 +13,25 @@ import numpy as np
 
 #---------------Wrappers-------------------------------------------
 
+def houghCT(frame_t, md, p1, p2, mnr, mxr):
+
+	gray = cv2.cvtColor(frame_t, cv2.COLOR_BGR2GRAY) 
+	gray_blurred = cv2.medianBlur(gray, 5) 
+	#rows = gray_blurred.shape[0]
+	# Apply Hough transform on the blurred image. 
+	detected_circles = cv2.HoughCircles(gray_blurred,
+    	cv2.HOUGH_GRADIENT, 1, md, param1 = p1, 
+    	param2 = p2, minRadius = mnr, maxRadius = mxr) 
+
+	if detected_circles is not None: 
+		detected_circles = np.uint16(np.around(detected_circles)) 
+		for pt in detected_circles[0, :]: 
+			a, b, r = pt[0], pt[1], pt[2]
+			cv2.circle(frame_t, (a, b), r, (0, 255, 0), 2) 
+			#cv2.circle(frame_t, (a, b), 2, (0, 0, 255), 3)
+
+	return frame_t 
+
 def sobel(frame_o, size_k, scale_o, delta_o):
 
 	src = cv2.GaussianBlur(frame_o, (3, 3), 0)
@@ -90,7 +109,7 @@ while(cap.isOpened()):
     	# Display the resulting frame
     	cv2.imshow('Frame',grayFrame)
     	out.write(grayframe)
-    	# Press Q on keyboard to  exit
+    	# Press Q on keyboard to exit
     	if cv2.waitKey(25) & 0xFF == ord('q'):
     		break
 
@@ -258,15 +277,47 @@ while(cap.isOpened()):
     		break
 
 #-----------------Hough Circle Detection------------------------
+    elif (retval >= 26000 and retval < 28000):
 
+    	all_circle = houghCT(frame, 20, 200, 30, 2, 30)
+    	cv2.imshow("Detected Circle", all_circle)
+    	out.write(all_circle)
 
+    	if cv2.waitKey(25) & 0xFF == ord('q'):
+    		break
+
+    elif (retval >= 28000 and retval < 30000):
+
+    	all_circle = houghCT(frame, 20, 200, 30, 2, 30)
+    	cv2.imshow("Detected Circle", all_circle)
+    	out.write(all_circle)
+
+    	if cv2.waitKey(25) & 0xFF == ord('q'):
+    		break
+
+    elif (retval >= 30000 and retval < 33000):
+
+    	all_circle = houghCT(frame, 20, 200, 30, 2, 30)
+    	cv2.imshow("Detected Circle", all_circle)
+    	out.write(all_circle)
+
+    	if cv2.waitKey(25) & 0xFF == ord('q'):
+    		break
+
+    elif (retval >= 33000 and retval < 36000):
+
+    	all_circle = houghCT(frame, 20, 200, 30, 2, 30)
+    	cv2.imshow("Detected Circle", all_circle)
+    	out.write(all_circle)
+
+    	if cv2.waitKey(25) & 0xFF == ord('q'):
+    		break
 
     else:
     	cv2.imshow('Frame',frame)
     	out.write(frame)
     	if cv2.waitKey(25) & 0xFF == ord('q'):
     		break
-
 
   # Break the loop
   else: 
