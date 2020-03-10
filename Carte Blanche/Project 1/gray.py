@@ -98,6 +98,7 @@ while(cap.isOpened()):
 
   # Capture frame-by-frame
   ret, frame = cap.read()
+  #frame = cv2.flip(frame, -1)
   retval = cap.get(cv2.CAP_PROP_POS_MSEC)
   #print(retval)
   grayFrame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
@@ -280,7 +281,7 @@ while(cap.isOpened()):
     elif (retval >= 26000 and retval < 28000):
 
     	all_circle = houghCT(frame, 20, 200, 30, 2, 30)
-    	cv2.imshow("Detected Circle", all_circle)
+    	cv2.imshow("Frame", all_circle)
     	out.write(all_circle)
 
     	if cv2.waitKey(25) & 0xFF == ord('q'):
@@ -289,7 +290,7 @@ while(cap.isOpened()):
     elif (retval >= 28000 and retval < 30000):
 
     	all_circle = houghCT(frame, 20, 200, 30, 2, 30)
-    	cv2.imshow("Detected Circle", all_circle)
+    	cv2.imshow("Frame", all_circle)
     	out.write(all_circle)
 
     	if cv2.waitKey(25) & 0xFF == ord('q'):
@@ -298,7 +299,7 @@ while(cap.isOpened()):
     elif (retval >= 30000 and retval < 33000):
 
     	all_circle = houghCT(frame, 20, 200, 30, 2, 30)
-    	cv2.imshow("Detected Circle", all_circle)
+    	cv2.imshow("Frame", all_circle)
     	out.write(all_circle)
 
     	if cv2.waitKey(25) & 0xFF == ord('q'):
@@ -307,11 +308,38 @@ while(cap.isOpened()):
     elif (retval >= 33000 and retval < 36000):
 
     	all_circle = houghCT(frame, 20, 200, 30, 2, 30)
-    	cv2.imshow("Detected Circle", all_circle)
+    	cv2.imshow("Frame", all_circle)
     	out.write(all_circle)
 
     	if cv2.waitKey(25) & 0xFF == ord('q'):
     		break
+
+    #-----------Template Matching-------------------------------
+    elif(retval >= 36000 and retval <39000):
+    	img = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    	img2 = img.copy()
+    	template1 = cv2.imread('disc.png')
+    	template = cv2.cvtColor(template1, cv2.COLOR_BGR2GRAY)
+    	#template.astype(np.uint8)
+    	w, h = template.shape[::-1]
+    	methods = ['cv2.TM_CCOEFF', 'cv2.TM_CCOEFF_NORMED', 'cv2.TM_CCORR',
+    	'cv2.TM_CCORR_NORMED', 'cv2.TM_SQDIFF', 'cv2.TM_SQDIFF_NORMED']
+    	img = img2.copy()
+    	method = eval(methods[3])
+    	# Apply template Matching
+    	res = cv2.matchTemplate(img,template,method)
+    	min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
+    	if method in [cv2.TM_SQDIFF, cv2.TM_SQDIFF_NORMED]:
+    		top_left = min_loc
+    	else:
+    		top_left = max_loc
+    	bottom_right = (top_left[0] + w, top_left[1] + h)
+    	cv2.rectangle(frame,top_left, bottom_right, 255, 2)
+    	#main = cv2.cvtColor(res, cv2.COLOR_GRAY2BGR)
+    	#flip = cv2.flip(frame, -1)
+    	#flip2 = cv2.flip(main, -1)
+    	cv2.imshow("Frame", frame)
+    	out.write(frame)
 
     else:
     	cv2.imshow('Frame',frame)
