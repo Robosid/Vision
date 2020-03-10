@@ -77,9 +77,13 @@ out = cv2.VideoWriter('outpy.avi',cv2.VideoWriter_fourcc(*'XVID'), cap.get(cv2.C
 
 print(cap.get(cv2.CAP_PROP_FPS))
 
+count = 0
 v = 1
-val = 1
-
+val = 75
+fgbg2 = cv2.createBackgroundSubtractorKNN()
+fgbg = cv2.createBackgroundSubtractorMOG2()
+face_cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
+eye_cascade = cv2.CascadeClassifier('haarcascade_eye.xml')
 
 #------------------Trackbars for HSV---------------------------------
 def nothing(x):
@@ -140,9 +144,9 @@ while(cap.isOpened()):
     	real-time applications, and perhaps d=9 for offline applications that need heavy noise filtering.
     	'''
     	#gb = cv2.GaussianBlur(frame, (v, v), 0)
-    	#blf = cv2.bilateralFilter(frame,9,75,75) #ALTER SIGMAS
+    	#blf = cv2.bilateralFilter(frame,9,val,val) #ALTER SIGMAS
     	#v = v + 2
-    	#val = val + 1	
+    	#val = val + 2	
     	#image = cv2.resize(gb, (0, 0), None, .50, 1)
     	#image2 = cv2.resize(blf, (0, 0), None, .50, 1)
     	#horizontal = np.hstack((image, image2))
@@ -169,8 +173,8 @@ while(cap.isOpened()):
     	#-----------------------------------------------
 
     	# define range of specific color in HSV after obtaining values from selector
-    	lower = np.array([0,76,0])
-    	upper = np.array([39,255,255])    	
+    	lower = np.array([15,100,20])
+    	upper = np.array([25,190,190])    	
     	
     	# Threshold the HSV image to get only specific color
     	mask = cv2.inRange(hsv, lower, upper)
@@ -181,8 +185,8 @@ while(cap.isOpened()):
     	res = cv2.bitwise_and(img,img, mask= mask)
         
         #-----------RGB --------SECTION------------------
-    	lowerbgr = np.array([17, 15, 100])
-    	upperbgr = np.array([50, 56, 200])
+    	lowerbgr = np.array([20, 40, 60])
+    	upperbgr = np.array([80, 160, 200])
     	maskbgr = cv2.inRange(frame, lowerbgr, upperbgr)
     	resbgr = cv2.bitwise_and(img,img, mask= maskbgr)
 
@@ -216,8 +220,8 @@ while(cap.isOpened()):
     	#-----------------------------------------------
 
     	# define range of specific color in HSV after obtaining values from selector
-    	lower = np.array([0,76,0])
-    	upper = np.array([39,255,255])    	
+    	lower = np.array([15,100,20])
+    	upper = np.array([25,190,190])    	
     	
     	# Threshold the HSV image to get only specific color
     	mask = cv2.inRange(hsv, lower, upper)
@@ -280,7 +284,7 @@ while(cap.isOpened()):
 #-----------------Hough Circle Detection------------------------
     elif (retval >= 26000 and retval < 28000):
 
-    	all_circle = houghCT(frame, 20, 200, 30, 2, 30)
+    	all_circle = houghCT(frame, 800, 200, 50, 1, 300)
     	cv2.imshow("Frame", all_circle)
     	out.write(all_circle)
 
@@ -289,7 +293,7 @@ while(cap.isOpened()):
 
     elif (retval >= 28000 and retval < 30000):
 
-    	all_circle = houghCT(frame, 20, 200, 30, 2, 30)
+    	all_circle = houghCT(frame, 80, 200, 50, 130, 300)
     	cv2.imshow("Frame", all_circle)
     	out.write(all_circle)
 
@@ -298,7 +302,7 @@ while(cap.isOpened()):
 
     elif (retval >= 30000 and retval < 33000):
 
-    	all_circle = houghCT(frame, 20, 200, 30, 2, 30)
+    	all_circle = houghCT(frame, 1, 200, 50, 130, 300)
     	cv2.imshow("Frame", all_circle)
     	out.write(all_circle)
 
@@ -307,7 +311,7 @@ while(cap.isOpened()):
 
     elif (retval >= 33000 and retval < 36000):
 
-    	all_circle = houghCT(frame, 20, 200, 30, 2, 30)
+    	all_circle = houghCT(frame, 1, 200, 40, 100, 300)
     	cv2.imshow("Frame", all_circle)
     	out.write(all_circle)
 
@@ -315,7 +319,7 @@ while(cap.isOpened()):
     		break
 
     #-----------Template Matching-------------------------------
-    elif(retval >= 36000 and retval <39000):
+    elif(retval >= 36000 and retval <41000):
     	img = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     	img2 = img.copy()
     	template1 = cv2.imread('disc.png')
@@ -340,12 +344,79 @@ while(cap.isOpened()):
     	#flip2 = cv2.flip(main, -1)
     	cv2.imshow("Frame", frame)
     	out.write(frame)
+    	if cv2.waitKey(25) & 0xFF == ord('q'):
+    		break
+
+    #-----------------CARTE BLANCHE--------------------------------
+
+    elif(retval >= 41000 and retval <46000): # MOG
+    	
+    	fgmask = fgbg.apply(frame)
+    	#fgmask = fgbg2.apply(frame)    	
+    	fgmask_write = cv2.cvtColor(fgmask, cv2.COLOR_GRAY2BGR)
+    	cv2.imshow("Frame", fgmask)
+    	out.write(fgmask_write)
+    	if cv2.waitKey(25) & 0xFF == ord('q'):
+    		break
+
+    elif(retval >= 51000 and retval <56000): # MOG
+    	
+    	fgmask = fgbg.apply(frame)
+    	#fgmask = fgbg2.apply(frame)    	
+    	fgmask_write = cv2.cvtColor(fgmask, cv2.COLOR_GRAY2BGR)
+    	cv2.imshow("Frame", fgmask)
+    	out.write(fgmask_write)
+    	if cv2.waitKey(25) & 0xFF == ord('q'):
+    		break    		
+
+    elif(retval >= 56000 and retval <61000): #Cascade
+    	
+    	gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    	faces = face_cascade.detectMultiScale(gray, 1.3, 5)
+    	for (x,y,w,h) in faces:
+    		cv2.rectangle(img,(x,y),(x+w,y+h),(255,0,0),2)
+    		roi_gray = gray[y:y+h, x:x+w]
+    		roi_color = img[y:y+h, x:x+w]
+    		eyes = eye_cascade.detectMultiScale(roi_gray)
+    		for (ex,ey,ew,eh) in eyes:
+    			cv2.rectangle(roi_color,(ex,ey),(ex+ew,ey+eh),(0,255,0),2)
+    	
+    	cv2.imshow('Frame',frame)
+    	out.write(frame)
+    	if cv2.waitKey(25) & 0xFF == ord('q'):
+    		break
+
+    elif(retval >= 46000 and retval <51000): #Camshift
+    	
+    	if(count == 0):
+    		x, y, w, h = 100, 100, 100, 50 
+    		track_window = (x, y, w, h)
+    		roi = frame[y:y+h, x:x+w]
+    		hsv_roi =  cv2.cvtColor(roi, cv2.COLOR_BGR2HSV)
+    		mask = cv2.inRange(hsv_roi, np.array((0., 60.,32.)), np.array((180.,255.,255.)))
+    		roi_hist = cv2.calcHist([hsv_roi],[0],mask,[180],[0,180])
+    		cv2.normalize(roi_hist,roi_hist,0,255,cv2.NORM_MINMAX)
+    		term_crit = ( cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 1000, 1 )
+    		count = 10
+    	hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+    	dst = cv2.calcBackProject([hsv],[0],roi_hist,[0,180],1)
+    	# apply camshift to get the new location
+    	ret, track_window = cv2.CamShift(dst, track_window, term_crit)
+    	# Draw it on image
+    	pts = cv2.boxPoints(ret)
+    	pts = np.int0(pts)
+    	img2 = cv2.polylines(frame,[pts],True, 255,2)
+    	cv2.imshow('Frame',img2)
+    	out.write(img2)
+    	if cv2.waitKey(25) & 0xFF == ord('q'):
+    		break
 
     else:
     	cv2.imshow('Frame',frame)
     	out.write(frame)
     	if cv2.waitKey(25) & 0xFF == ord('q'):
     		break
+
 
   # Break the loop
   else: 
@@ -357,4 +428,3 @@ out.release()
 
 # Closes all the frames
 cv2.destroyAllWindows()
-
